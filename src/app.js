@@ -16,8 +16,12 @@ app.use(express.static("public"));
 
 //routes related work now
 import RegisterStudentRouter from "./routes/RegisStu.router.js";
+import ApplicationRouter from "./routes/Application.routes.js"
+import AdminRouter from "./routes/Admin.routes.js"
 
-app.use("/regis", RegisterStudentRouter);
+app.use("/api/v1/regis", RegisterStudentRouter);
+app.use("/api/v1/application", ApplicationRouter);
+app.use("/api/v1/admin", AdminRouter);
 
 
 

@@ -50,11 +50,11 @@ studentSchema.pre("save", async function (next) {
     next()
 })
 
-studentSchema.method.isPasswordCorrect = async function(password){
+studentSchema.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password, this.password)
 }
 
-studentSchema.method.generateAccessToken = async function(){
+studentSchema.methods.generateAccessToken = function(){
     return jwt.sign(
         {
             _id: this._id,
@@ -67,8 +67,8 @@ studentSchema.method.generateAccessToken = async function(){
         }
     )
 }
-
-studentSchema.method.generateRefreshToken = async function(){
+//do not do this function as async function else it would return promise
+studentSchema.methods.generateRefreshToken = function(){
     return jwt.sign(
         {
             _id: this._id,

@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { EditDetails, LoginStudent, RegisterStudent } from "../controllers/RegisStu.controller.js";
+import { LoginStudent, LogoutStudent, RegisterStudent, changePassword } from "../controllers/RegisStu.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import { verifyJWT } from "../middlewares/verifyJWT.middleware.js";
 const router = Router();
 
 router.route("/register").post(
@@ -10,14 +11,15 @@ router.route("/register").post(
             maxCount: 1
         },
         {
-            name: 'gradeCard',
+            name: 'gradeCards',
             maxCount: 8
         }
     ])
     ,RegisterStudent);
     
 router.route("/login").post(LoginStudent);
-router.route("/edit").post(EditDetails);
+router.route("/logout").post(verifyJWT, LogoutStudent);
+router.route("/change-password").post(verifyJWT, changePassword);
 
 
 export default router;
