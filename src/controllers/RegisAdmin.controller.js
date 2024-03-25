@@ -20,9 +20,9 @@ const generateAccessAndRefreshToken =  async (admin_id)=>{
 
 const RegisterAdmin = asyncHandler( async(req, res)=>{
     //TODO: register admin
-    const {userName, password} = req.body;
+    const {userName, password, dept_name, incharge} = req.body;
 
-    if([userName, password].some((field)=> field?.trim() === "")){
+    if([userName, password, dept_name, incharge].some((field)=> field?.trim() === "")){
         throw new ApiError(400, "No feilds can be empty")
     }
 
@@ -34,7 +34,9 @@ const RegisterAdmin = asyncHandler( async(req, res)=>{
     const admin = await Admin.create(
         {
             userName,
-            password
+            password,
+            dept_name,
+            incharge
         }
     )
 
@@ -122,8 +124,33 @@ const LogoutAdmin = asyncHandler( async(req, res)=>{
     .json(new ApiResponse(200, {}, "admin logged Out"))
 })
 
+const editIncharge = asyncHandler( async(req, res)=>{
+    const { newIncharge, password } = req.body;
+
+    if([newIncharge, password].some((field)=> field?.trim() === "")){
+        throw new ApiError(400, "No feilds can be empty")
+    }
+
+    const response = await Admin.findByIdAndUpdate(
+        req.admin._id,
+        {
+            $set: {
+                incharge: newIncharge 
+            }
+        },
+        {
+            new: true
+        }
+    )
+    return res.status(200).json(
+        new ApiResponse(
+            200, response, "successfully updated incharge"
+        )
+    )
+})
 export {
     RegisterAdmin,
     LogoutAdmin,
-    LoginAdmin
+    LoginAdmin,
+    editIncharge
 }

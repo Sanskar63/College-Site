@@ -12,6 +12,15 @@ const adminSchema = new Schema({
         type: String,
         required: true
     },
+    dept_name:{
+        type: String,
+        enum: ['Dept_1', 'Dept_2', 'Dept_3'],
+        required: true
+    },
+    incharge: {
+        type: String,
+        required: true
+    },
     refreshToken:{
         type: String
     }

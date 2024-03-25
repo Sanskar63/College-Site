@@ -17,7 +17,7 @@ const applicationSchema = new Schema({
     },
     to: {
         type: Schema.Types.ObjectId,
-        ref: "departments",
+        ref: "Admin",
         required: true
     }
 
