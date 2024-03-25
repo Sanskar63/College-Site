@@ -1,14 +1,14 @@
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { Application } from "../models/application.models.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { Complaint } from "../models/complaints.models.js";
 import { Student } from "../models/students.model.js";
 import { Admin } from "../models/admin.models.js";
 import mongoose from "mongoose";
 
-const getApplications = asyncHandler( async(req, res)=>{
+const getComplaints = asyncHandler( async(req, res)=>{
     //TODO: get show the applications
-    const allApplications = await Admin.aggregate([
+    const allComplaints = await Admin.aggregate([
         {
             $match:{
                 _id: new mongoose.Types.ObjectId(req.admin._id)
@@ -16,16 +16,16 @@ const getApplications = asyncHandler( async(req, res)=>{
         },
         {
             $lookup:{
-                from:"applications",
+                from:"complaints",
                 localField: "_id",
                 foreignField:"to",
-                as: "Applications"
+                as: "Complaints"
             }
         },
         {
             $project:{
                 _id:1,
-                Applications: "$Applications"
+                Complaints: "$Complaints"
             }
         }
     ])
@@ -36,13 +36,13 @@ const getApplications = asyncHandler( async(req, res)=>{
     .json(
         new ApiResponse(
             200,
-            allApplications[0],
-            "Application fetched successfully"
+            allComplaints[0],
+            "Complaints fetched successfully"
         )
     )
 })
 
-const writeApplication = asyncHandler( async(req, res)=>{
+const writeComplaint = asyncHandler( async(req, res)=>{
     //TODO: writer application and save in db
     //get content , to, passsword 
     //to will be department name of department schema
@@ -66,45 +66,46 @@ const writeApplication = asyncHandler( async(req, res)=>{
         throw new ApiError(400, "Invalid Department name");
     }
     // console.log(dept);
-    const application = await Application.create({
+    const complaint = await Complaint.create({
         content,
         to:admin._id,
         writtenBy: student._id
     })
 
     return res.status(200).json(
-        new ApiResponse(200, {application}, "Application sent successfully")
+        new ApiResponse(200, complaint, "Complaint sent successfully")
     )
 })
 
-const editApplication = asyncHandler( async(req, res)=>{
+const editComplaint = asyncHandler( async(req, res)=>{
     //TODO: make functionality for setting the status of application
-    const {applicationId, status} = req.body;
+    const { complaintId, status} = req.body;
     const admin = await Admin.findById(req.admin._id);
     if(!admin){
         throw new ApiError(400, "Unauthorised Access")
     }
 
-    const application = await Application.findByIdAndUpdate(
-        new mongoose.Types.ObjectId(applicationId),
+    const complaint = await Complaint.findByIdAndUpdate(
+        new mongoose.Types.ObjectId(complaintId),
         {
             $set: { status }
         },{
             new: true
         });
 
-    if(!application){
-        throw new ApiError(400, "No such application Exists")
+
+    if(!complaint){
+        throw new ApiError(400, "No such complaints Exists")
     }
 
     return res.status(200).json(
         new ApiResponse(
-            200, application, "status updated successfully"
+            200, complaint, "status updated successfully"
         )
     )
 })
 
-const getMyApplications = asyncHandler( async(req, res)=>{
+const getMyComplaints = asyncHandler( async(req, res)=>{
     //TODO: show application written by our student
     const student = await Student.aggregate([
         {
@@ -114,16 +115,16 @@ const getMyApplications = asyncHandler( async(req, res)=>{
         },
         {
             $lookup:{
-                from:"applications",
+                from:"complaints",
                 localField: "_id",
                 foreignField:"writtenBy",
-                as: "myApplications"
+                as: "myComplaints"
             }
         },
         {
             $project:{
                 _id:1,
-                myApplications: "$myApplications"
+                myComplaints: "$myComplaints"
             }
         }
     ])
@@ -135,14 +136,14 @@ const getMyApplications = asyncHandler( async(req, res)=>{
         new ApiResponse(
             200,
             student[0],
-            "Application fetched successfully"
+            "Complaints fetched successfully"
         )
     )
 })
 
 export {
-    getApplications,
-    getMyApplications,
-    writeApplication,
-    editApplication
+    editComplaint,
+    getComplaints,
+    writeComplaint,
+    getMyComplaints
 }
