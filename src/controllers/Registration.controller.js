@@ -126,6 +126,47 @@ const hostelRegistration = asyncHandler(async (req, res) => {
 
 })
 
+const getAllRegistrationForms = asyncHandler( async (req, res)=>{
+    //verify if authorised admin is accessing the information
+    //group all registration documents and give
+
+    const admin = await Admin.findById(req.admin._id);
+    if(admin.dept_name !== REGISTRATION_DEPARTMENT){
+        throw new ApiError(200, "Unauthorised Request to data access")
+    }
+
+    const allForms = await Registration.aggregate([
+        {
+          $group: {
+            _id: null,
+            forms: { $push: "$$ROOT" }, // Push all documents into an array
+            //The $push operator accumulates all the documents into an array called forms.
+            //In MongoDB's aggregation framework, $$ROOT is a system variable that references the root document being processed in the aggregation pipeline. It represents the entire document that is currently being processed at that stage of the pipeline.
+
+            //When you use $$ROOT within an aggregation stage, it captures the entire document being processed and allows you to reference all of its fields and values.
+            total: { $sum: 1 }, // Count the total number of documents
+          }
+        },
+        {
+          $project: {
+            _id: 0, // Exclude _id field from the result
+            forms: 1, // Include the forms array in the result
+            total: 1 // Include the total count in the result
+          }
+        }
+      ]);
+      
+    if(!allForms){
+        return res.status(200).json(
+            new ApiResponse(200, {}, "No forms available")
+        )
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, allForms, "forms fetched successfully")
+    )
+})
+
 const verifyRegistration = asyncHandler(async (req, res) => {
     // take input from admin for courseStatus, hostelStatus, registration_id
     //find the document and update the status
@@ -164,5 +205,6 @@ const verifyRegistration = asyncHandler(async (req, res) => {
 export {
     courseRegistration,
     hostelRegistration,
-    verifyRegistration
+    verifyRegistration,
+    getAllRegistrationForms
 }
