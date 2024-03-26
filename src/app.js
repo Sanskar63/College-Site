@@ -19,11 +19,13 @@ import RegisterStudentRouter from "./routes/RegisStu.router.js";
 import ApplicationRouter from "./routes/Application.routes.js"
 import AdminRouter from "./routes/Admin.routes.js"
 import Complaints from "./routes/Complaint.routes.js"
+import Registration from "./routes/Registration.routes.js"
 
 app.use("/api/v1/regis", RegisterStudentRouter);
 app.use("/api/v1/application", ApplicationRouter);
 app.use("/api/v1/admin", AdminRouter);
 app.use("/api/v1/complaint", Complaints);
+app.use("/api/v1/registration", Registration);
 
 
 
