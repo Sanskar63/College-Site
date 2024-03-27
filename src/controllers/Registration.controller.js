@@ -126,7 +126,7 @@ const hostelRegistration = asyncHandler(async (req, res) => {
 
 })
 
-const getAllRegistrationForms = asyncHandler( async (req, res)=>{
+const getAllRegistrationForms = asyncHandler( async (req, res)=>{3
     //verify if authorised admin is accessing the information
     //group all registration documents and give
 
