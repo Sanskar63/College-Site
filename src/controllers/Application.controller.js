@@ -11,7 +11,7 @@ const getApplications = asyncHandler( async(req, res)=>{
     const allApplications = await Admin.aggregate([
         {
             $match:{
-                _id: new mongoose.Types.ObjectId(req.admin._id)
+                _id: new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {
@@ -54,8 +54,9 @@ const writeApplication = asyncHandler( async(req, res)=>{
     if([content, to, password].some((field)=> field?.trim()==="")){
         throw new ApiError(400, "No field can be empty")
     }
-    const student = await Student.findById(req.student._id)
-    // console.log(student)
+    // console.log(req.user);
+    const student = await Student.findById(req.user._id)
+    console.log(student)
     const isPasswordCorrect = await student.isPasswordCorrect(password);
     if(!isPasswordCorrect){
         throw new ApiError(400, "invalid password")
@@ -80,7 +81,7 @@ const writeApplication = asyncHandler( async(req, res)=>{
 const editApplication = asyncHandler( async(req, res)=>{
     //TODO: make functionality for setting the status of application
     const {applicationId, status} = req.body;
-    const admin = await Admin.findById(req.admin._id);
+    const admin = await Admin.findById(req.user._id);
     if(!admin){
         throw new ApiError(400, "Unauthorised Access")
     }
@@ -109,7 +110,7 @@ const getMyApplications = asyncHandler( async(req, res)=>{
     const student = await Student.aggregate([
         {
             $match:{
-                _id: new mongoose.Types.ObjectId(req.student._id)
+                _id: new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {
