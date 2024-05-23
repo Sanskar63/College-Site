@@ -13,7 +13,7 @@ const enterOrUpdateHostelInfo = asyncHandler( async(req, res)=>{
         throw new ApiError(400, "no field can be empty")
     }
 
-    const admin = await Admin.findById(req.admin._id);
+    const admin = await Admin.findById(req.user._id);
     if(admin.dept_name !== HOSTEL_DEPARTMENT){
         throw new ApiError(401, "Unauthorised Access")
     }
@@ -52,4 +52,18 @@ const enterOrUpdateHostelInfo = asyncHandler( async(req, res)=>{
     )
 })
 
-export { enterOrUpdateHostelInfo };
+const GetHostelInfo = asyncHandler( async(req, res) =>{
+    const id = req.params.id;
+
+    const student = await HostelInfo.findOne({student:id})
+
+    if(!student){
+        throw new ApiError(400, "No Hostel Information found")
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, student, "Hostel information Fetched successfully")
+    )
+})
+
+export { enterOrUpdateHostelInfo, GetHostelInfo };

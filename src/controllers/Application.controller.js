@@ -17,7 +17,7 @@ const getApplications = asyncHandler( async(req, res)=>{
         {
             $lookup:{
                 from:"applications",
-                localField: "_id",
+                localField: "dept_name",
                 foreignField:"to",
                 as: "Applications"
             }
@@ -54,9 +54,9 @@ const writeApplication = asyncHandler( async(req, res)=>{
     if([content, to, password].some((field)=> field?.trim()==="")){
         throw new ApiError(400, "No field can be empty")
     }
-    // console.log(req.user);
+
     const student = await Student.findById(req.user._id)
-    console.log(student)
+
     const isPasswordCorrect = await student.isPasswordCorrect(password);
     if(!isPasswordCorrect){
         throw new ApiError(400, "invalid password")
@@ -69,8 +69,8 @@ const writeApplication = asyncHandler( async(req, res)=>{
     // console.log(dept);
     const application = await Application.create({
         content,
-        to:admin._id,
-        writtenBy: student._id
+        to:admin.dept_name,
+        writtenBy: student.rollno
     })
 
     return res.status(200).json(
@@ -116,7 +116,7 @@ const getMyApplications = asyncHandler( async(req, res)=>{
         {
             $lookup:{
                 from:"applications",
-                localField: "_id",
+                localField: "rollno",
                 foreignField:"writtenBy",
                 as: "myApplications"
             }

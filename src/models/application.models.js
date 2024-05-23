@@ -2,10 +2,13 @@ import { Schema, model } from "mongoose";
 
 const applicationSchema = new Schema({
     writtenBy:{
-        type: Schema.Types.ObjectId,
-        ref: "students",
+    //     type: Schema.Types.ObjectId,
+    //     ref: "students",
+    //     required: true
+        type: Number,
         required: true
     },
+    
     content:{
         type: String,
         required: true
@@ -16,8 +19,11 @@ const applicationSchema = new Schema({
         default: 'Pending' // Default value can be one of the allowed enum values
     },
     to: {
-        type: Schema.Types.ObjectId,
-        ref: "Admin",
+        // type: Schema.Types.ObjectId,
+        // ref: "Admin",
+        // required: true
+
+        type: String,
         required: true
     }
 

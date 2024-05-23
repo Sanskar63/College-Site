@@ -130,7 +130,7 @@ const LoginStudent = asyncHandler( async (req, res)=>{
 const changePassword = asyncHandler( async (req, res)=>{
     const {oldPassword, newPassword} = req.body;
     
-    const student = await Student.findById(req.student._id);
+    const student = await Student.findById(req.user._id);
 
     const isPasswordCorrect = await student.isPasswordCorrect(oldPassword);
 
@@ -150,7 +150,7 @@ const changePassword = asyncHandler( async (req, res)=>{
 
 const LogoutStudent = asyncHandler ( async (req, res)=> {
     await Student.findByIdAndUpdate(
-        req.student._id,
+        req.user._id,
         {
             $unset: {
                 refreshToken: 1 // this removes the field from document
@@ -176,9 +176,23 @@ const LogoutStudent = asyncHandler ( async (req, res)=> {
         .json(new ApiResponse(200, {}, "student logged Out"))
 })
 
+const GetStudent = asyncHandler (async (req, res)=>{
+    const id = req.params.id;
+    const student = await Student.findById(id).select("-password -refreshToken");
+    if(!student){
+        throw new ApiError(400, "No student of such id Exists");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(
+            200, student, "Student details sent successfully"
+        )
+    )
+})
 export {
     RegisterStudent,
     LoginStudent,
     changePassword,
-    LogoutStudent
+    LogoutStudent,
+    GetStudent
 }

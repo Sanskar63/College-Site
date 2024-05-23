@@ -20,14 +20,16 @@ const courseRegistration = asyncHandler(async (req, res) => {
     if (!currentSem || !password) {
         throw new ApiError(400, "all fields are required")
     }
+    console.log("details --------->", currentSem, password);
 
-    const student = await Student.findById(req.student._id);
+    const student = await Student.findById(req.user._id);
     const isPasswordCorrect = await student.isPasswordCorrect(password);
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Unauthorised access")
     }
 
     const courseProofLocalPath = req.files?.courseFile[0].path;
+    console.log("file---------->", courseProofLocalPath)
     if (!courseProofLocalPath) {
         throw new ApiError(400, "course Proof is required")
     }
@@ -38,7 +40,7 @@ const courseRegistration = asyncHandler(async (req, res) => {
     }
 
     const isAlreadyPresent = await Registration.findOneAndUpdate(
-        { student: req.student._id },
+        { student: req.user._id },
         {
             courseProof: courseProof.url,
             currentSem
@@ -57,7 +59,7 @@ const courseRegistration = asyncHandler(async (req, res) => {
     const course = await Registration.create({
         courseProof: courseProof.url,
         currentSem,
-        student: req.student._id
+        student: req.user._id
     });
 
     return res.status(200).json(
@@ -75,13 +77,13 @@ const hostelRegistration = asyncHandler(async (req, res) => {
     //verify if uploaded
     //check if already present db using student Id
     //if not present then create one else update
-
+    
     const { password } = req.body;
     if (!password) {
         throw new ApiError(400, "password is required")
     }
 
-    const student = await Student.findById(req.student._id);
+    const student = await Student.findById(req.user._id);
     const isPasswordCorrect = await student.isPasswordCorrect(password);
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Unauthorised access")
@@ -98,7 +100,7 @@ const hostelRegistration = asyncHandler(async (req, res) => {
     }
 
     const isAlreadyPresent = await Registration.findOneAndUpdate(
-        { student: req.student._id },
+        { student: req.user._id },
         {
             hostelProof: hostelProof.url,
         },
@@ -115,7 +117,7 @@ const hostelRegistration = asyncHandler(async (req, res) => {
 
     const hostel = await Registration.create({
         hostelProof: hostelProof.url,
-        student: req.student._id
+        student: req.user._id
     });
 
     return res.status(200).json(
@@ -130,7 +132,7 @@ const getAllRegistrationForms = asyncHandler( async (req, res)=>{3
     //verify if authorised admin is accessing the information
     //group all registration documents and give
 
-    const admin = await Admin.findById(req.admin._id);
+    const admin = await Admin.findById(req.user._id);
     if(admin.dept_name !== REGISTRATION_DEPARTMENT){
         throw new ApiError(200, "Unauthorised Request to data access")
     }
@@ -172,13 +174,13 @@ const verifyRegistration = asyncHandler(async (req, res) => {
     //find the document and update the status
 
     const { courseStatus, hostelStatus, registrationId } = req.body;
-
-    const department = await Admin.findById(req.admin._id);
+    // console.log("----->",req.body)
+    const department = await Admin.findById(req.user._id);
 
     const dept_name = department.dept_name;
 
     if(dept_name !== REGISTRATION_DEPARTMENT){
-        throw new ApiError(400, "Unauthorised Access")
+        throw new ApiError(400, "Unauthorised Department")
     }
     
     const registration = await Registration.findByIdAndUpdate(
@@ -202,9 +204,26 @@ const verifyRegistration = asyncHandler(async (req, res) => {
 
 })
 
+const getRegistrationForm = asyncHandler( async(req, res)=>{
+    const id = req.params.id;
+
+    const student = await Registration.findOne({student:id}).select("-password -accessToken");
+
+    if(!student){
+        throw new ApiError(400, "student don't have any registration for current semester or hostel")
+    }
+
+    return res.status(200).json(
+        new ApiResponse(
+            200, student, "fetched info successfully"
+        )
+    )
+})
+
 export {
     courseRegistration,
     hostelRegistration,
     verifyRegistration,
-    getAllRegistrationForms
+    getAllRegistrationForms,
+    getRegistrationForm
 }

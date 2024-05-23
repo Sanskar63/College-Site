@@ -11,13 +11,13 @@ const getComplaints = asyncHandler( async(req, res)=>{
     const allComplaints = await Admin.aggregate([
         {
             $match:{
-                _id: new mongoose.Types.ObjectId(req.admin._id)
+                _id: new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {
             $lookup:{
                 from:"complaints",
-                localField: "_id",
+                localField: "dept_name",
                 foreignField:"to",
                 as: "Complaints"
             }
@@ -54,7 +54,7 @@ const writeComplaint = asyncHandler( async(req, res)=>{
     if([content, to, password].some((field)=> field?.trim()==="")){
         throw new ApiError(400, "No field can be empty")
     }
-    const student = await Student.findById(req.student._id)
+    const student = await Student.findById(req.user._id)
     // console.log(student)
     const isPasswordCorrect = await student.isPasswordCorrect(password);
     if(!isPasswordCorrect){
@@ -68,8 +68,8 @@ const writeComplaint = asyncHandler( async(req, res)=>{
     // console.log(dept);
     const complaint = await Complaint.create({
         content,
-        to:admin._id,
-        writtenBy: student._id
+        to:admin.dept_name,
+        writtenBy: student.rollno
     })
 
     return res.status(200).json(
@@ -80,7 +80,7 @@ const writeComplaint = asyncHandler( async(req, res)=>{
 const editComplaint = asyncHandler( async(req, res)=>{
     //TODO: make functionality for setting the status of application
     const { complaintId, status} = req.body;
-    const admin = await Admin.findById(req.admin._id);
+    const admin = await Admin.findById(req.user._id);
     if(!admin){
         throw new ApiError(400, "Unauthorised Access")
     }
@@ -110,13 +110,13 @@ const getMyComplaints = asyncHandler( async(req, res)=>{
     const student = await Student.aggregate([
         {
             $match:{
-                _id: new mongoose.Types.ObjectId(req.student._id)
+                _id: new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {
             $lookup:{
                 from:"complaints",
-                localField: "_id",
+                localField: "rollno",
                 foreignField:"writtenBy",
                 as: "myComplaints"
             }

@@ -17,7 +17,6 @@ const registrationSchema = new Schema({
     },
     currentSem:{
         type: Number,
-        required: true
     },
     student:{
         type: Schema.Types.ObjectId,

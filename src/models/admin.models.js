@@ -14,7 +14,7 @@ const adminSchema = new Schema({
     },
     dept_name:{
         type: String,
-        enum: ['Dept_1', 'Dept_2', 'Dept_3'],
+        // enum: ['Dept_1', 'Dept_2', 'Dept_3'],
         required: true
     },
     incharge: {
