@@ -5,9 +5,9 @@ const EventSchema = new Schema({
         type: Date,
         required: true
     },
-    img: [
-       { type: String,} //Cloudinary Url
-    ],
+    img:
+        { type: String, } //Cloudinary Url
+    ,
     heading: {
         type: String
     },

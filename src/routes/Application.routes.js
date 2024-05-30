@@ -1,8 +1,6 @@
 import { Router } from "express";
 import { editApplication, getApplications, getMyApplications, writeApplication } from "../controllers/Application.controller.js";
 import { verifyJWT } from "../middlewares/verifyJWT.middleware.js";
-import { verifyAdmin } from "../middlewares/adminAuth.middleware.js";
-
 const router = Router();
 
 router.route("/getApplications").get(verifyJWT, getApplications); //add admin authentication middleware
